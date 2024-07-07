@@ -32,10 +32,19 @@ int main(int argc, char *argv[])
     socklen_t clientAddressLength = sizeof(clientAddress);
     int clientDescriptor = accept(serverSocket, (sockaddr *)&clientAddress, &clientAddressLength);
     cout << "CONNECTED " << endl;
+    
     while(true){
         memset(&message, 0, sizeof(message));
         recv(clientDescriptor, (char *)&message, sizeof(message), 0);
+
         cout << "Client: " << message << endl;
+
+        if(strcmp(message, "QUIT") == 0){
+            cout << "ENDING SESSION" << endl;
+            send(clientDescriptor, (char *) "QUIT", strlen(message), 0);
+            break;
+        }
+
         string input;
         getline(cin, input);
         memset(&message, 0, sizeof(message));

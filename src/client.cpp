@@ -28,6 +28,12 @@ int main(int argc, char* argv[]){
         strcpy(message, input.c_str());
         send(client, (char *)&message, strlen(message), 0);
         recv(client, (char *)&message, sizeof(message), 0);
+        
         cout << "Server: " << message << endl;
+
+        if(strcmp(message, "QUIT") == 0){
+            cout << "ENDING SESSION" << endl;
+            break;
+        }
     }
 }
