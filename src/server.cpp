@@ -1,34 +1,46 @@
-#include <cstdlib>
-#include <netinet/in.h>
-#include <stdio.h>
-#include <string.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
 #include <iostream>
+#include <string>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
+#include <netdb.h>
+
 using namespace std;
 
-int main(int argc, char *argv[]){
-
+int main(int argc, char *argv[])
+{
     int port = atoi(argv[1]);
     char message[2100];
-    //Struct for internet syscall n functions
+     
     sockaddr_in serverAddress;
     memset(&serverAddress, '\0', sizeof(serverAddress));
     serverAddress.sin_family = AF_INET;
-    //Convert to big endian
     serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
     serverAddress.sin_port = htons(port);
+ 
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-    listen(serverSocket, 2);
+    bind(serverSocket, (struct sockaddr*) &serverAddress, sizeof(serverAddress));
+
+    listen(serverSocket, 1);
     
     sockaddr_in clientAddress;
-    int clientDescriptor = accept(serverSocket, (sockaddr *)&clientAddress, (socklen_t *) sizeof(clientAddress));
+    socklen_t clientAddressLength = sizeof(clientAddress);
+    int clientDescriptor = accept(serverSocket, (sockaddr *)&clientAddress, &clientAddressLength);
+    cout << "CONNECTED " << endl;
     while(true){
         memset(&message, 0, sizeof(message));
         recv(clientDescriptor, (char *)&message, sizeof(message), 0);
         cout << "Client: " << message << endl;
-        memset(&message, 0, sizeof(message));
+        string input;
+        getline(cin, input);
+        strcpy(message, input.c_str());
+        send(clientDescriptor, (char *) &message, strlen(message), 0);
+        //memset(&message, 0, sizeof(message));
     }
     close(clientDescriptor);
     close(serverSocket);
