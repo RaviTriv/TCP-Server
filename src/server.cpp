@@ -38,9 +38,9 @@ int main(int argc, char *argv[])
         cout << "Client: " << message << endl;
         string input;
         getline(cin, input);
+        memset(&message, 0, sizeof(message));
         strcpy(message, input.c_str());
         send(clientDescriptor, (char *) &message, strlen(message), 0);
-        //memset(&message, 0, sizeof(message));
     }
     close(clientDescriptor);
     close(serverSocket);
